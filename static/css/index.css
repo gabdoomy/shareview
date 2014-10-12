@@ -1,0 +1,50 @@
+html{
+  height: 100%;
+}
+body {
+  height: 100%;
+  width: 100%;
+  background: url('../images/background_index.jpg') no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  display:none;  
+}
+#button_enter{
+  float: right;
+  width: 40%;
+  color: #84a3a5;
+  font-size: 30px;
+  text-decoration: none;
+  margin: 15% 30% 0% 30%;
+}
+
+#black_line{
+  min-height: 100%;
+  margin: 0% 10% 0% 80%;
+  display: block;
+  background-color: #000;
+  opacity:0.6;
+  filter:alpha(opacity=40);
+}
+
+a:link { 
+  text-decoration: none;
+  color: #FFF;
+}
+
+a:visited { 
+  text-decoration: none;
+  color: #FFF;
+}
+
+a:hover {
+  text-decoration: none;
+  color: #bc7e41;
+}
+
+a:active {
+  text-decoration: none;
+  color: #84a3a5;
+}
