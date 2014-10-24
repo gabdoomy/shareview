@@ -10,15 +10,35 @@ from wtforms.validators import DataRequired
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer
 import sqlalchemy as sa
-
-db = SQLAlchemy()
+import os
+import MySQLdb
 
 
 app = Flask(__name__)
 app.config.from_object('config')
 
-engine = create_engine('mysql+mysqldb://ad1444:bristolad1444@db4free.net/bristolad1444')
-connection = engine.connect()
+env = os.getenv('SERVER_SOFTWARE')
+if (env and env.startswith('Google App Engine/')):
+# Connecting from App Engine
+    db = MySQLdb.connect(
+    unix_socket='/cloudsql/bristoluni-ad-1444:us-instance',
+    user='root')
+else:
+  # You may also assign an IP Address from the access control
+# page and use it to connect from an external network.
+    db = MySQLdb.connect(host='173.194.254.24', port=3306, db='shareview', user='root', passwd='password')
+
+cursor = db.cursor()
+#cursor.execute('CREATE DATABASE shareview;')
+#cursor.execute('CREATE TABLE IF NOT EXISTS shareview.users (ID INT NOT NULL AUTO_INCREMENT,  username VARCHAR(255),  password VARCHAR(255),  PRIMARY KEY(ID));')
+cursor.execute('SELECT ID, username, password from shareview.users;')
+
+userlist = [];
+for row in cursor.fetchall():
+    userlist.append(dict([('ID',row[0]),
+                         ('username',row[1]),
+                         ('password',row[2])
+                         ]))
 
 
 # result = connection.execute("SELECT username FROM users")
@@ -49,16 +69,11 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    meta = MetaData()
-    users_table = Table('users', meta,
-        Column('id', sa.Integer, primary_key=True),
-        Column('username', sa.String(50)),
-        Column('password', sa.String(100))
-    )
-    result = connection.execute(users_table.select(users_table.c.username == form.username.data))
-    for row in result:
-        passdb = row['password']
-    if form.validate_on_submit() and form.password.data==passdb:
+    result='password'
+    cursor.execute('SELECT password from shareview.users where username=\"'+MySQLdb.escape_string(str(form.username.data))+'\";')
+    for row in cursor.fetchall():
+        result = row[0]
+    if form.validate_on_submit() and form.password.data==result:
         flash('Login requested for OpenID="%s", remember_me=%s' %
               (form.username.data, str(form.remember_me.data)))
         return redirect('/home')
@@ -69,7 +84,7 @@ def login():
 @app.route('/home')
 def home():
     """Home page"""
-    user = {'nickname': 'Miguel'} 
+    user = {'userlist': userlist}
     posts = [  # fake array of posts
         { 
             'author': {'nickname': 'John'}, 
