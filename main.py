@@ -2,14 +2,11 @@ from __future__ import print_function
 from flask import Flask
 from flask import render_template, flash, redirect
 from flask_bootstrap import Bootstrap
-import flask_login
 from flask.ext.wtf import Form
 from wtforms import StringField, BooleanField
 from wtforms.validators import DataRequired
+from google.appengine.api import users
 
-from flask.ext.sqlalchemy import SQLAlchemy
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer
-import sqlalchemy as sa
 import os
 import MySQLdb
 
@@ -41,12 +38,6 @@ for row in cursor.fetchall():
                          ]))
 
 
-# result = connection.execute("SELECT username FROM users")
-
-# for row in result:
-#     print ("username:", row['username'])
-# connection.close()
-
   
 @app.route('/testdb')
 def testdb():
@@ -59,7 +50,10 @@ def testdb():
 Bootstrap(app)
 app.config['DEBUG'] = True
 
-
+@app.route('/logingoogle')
+def check():
+    response = check_login()
+    return response
 
 @app.route('/')
 def index():
@@ -74,6 +68,7 @@ def login():
     for row in cursor.fetchall():
         result = row[0]
     if form.validate_on_submit() and form.password.data==result:
+        flash("Logged in successfully.")
         flash('Login requested for OpenID="%s", remember_me=%s' %
               (form.username.data, str(form.remember_me.data)))
         return redirect('/home')
@@ -84,7 +79,7 @@ def login():
 @app.route('/home')
 def home():
     """Home page"""
-    user = {'userlist': userlist}
+    user = users.get_current_user()
     posts = [  # fake array of posts
         { 
             'author': {'nickname': 'John'}, 
@@ -97,7 +92,7 @@ def home():
     ]
     return render_template('home.html',
     						title='Home',
-                           	user=user,
+                           	user=user.nickname(),
                            	posts=posts)
 
 
@@ -106,9 +101,31 @@ def page_not_found(e):
     """Return a custom 404 error."""
     return 'Sorry, nothing at this URL.', 404
 
+def check_auth():
+    user = users.get_current_user()
+    if user:
+        greeting = ('Welcome, %s! (<a href="%s">sign out</a>)' %
+                    (user.nickname(), users.create_logout_url('/')))
+    else:
+        greeting = ('<a href="%s">Sign in or register</a>.' %
+                    users.create_login_url('/'))
+
+    return ('<html><body>%s</body></html>' % greeting)
+
+def check_login():
+    user = users.get_current_user()
+    if user:
+        greeting = ('Welcome, %s! (<a href="%s">sign out</a>)' %
+                    (user.nickname(), users.create_logout_url('/')))
+    else:
+        greeting = ('<a href="%s">Sign in or register</a>.' %
+                    users.create_login_url('/'))
+    return greeting
+
 class LoginForm(Form):
 	username = StringField('user', validators=[DataRequired()])
 	password = StringField('pass', validators=[DataRequired()])
 	remember_me = BooleanField('remember_me', default=False)
+
 
 
