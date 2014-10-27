@@ -25,21 +25,10 @@ import functools
 from datetime import datetime
 from time import strptime
 
-from openid.oidutil import importElementTree
-ElementTree = importElementTree()
+from openid.oidutil import importElementTree, importSafeElementTree
 
-# the different elementtree modules don't have a common exception
-# model. We just want to be able to catch the exceptions that signify
-# malformed XML data and wrap them, so that the other library code
-# doesn't have to know which XML library we're using.
-try:
-    # Make the parser raise an exception so we can sniff out the type
-    # of exceptions
-    ElementTree.XML('> purposely malformed XML <')
-except (SystemExit, MemoryError, AssertionError, ImportError):
-    raise
-except:
-    XMLError = sys.exc_info()[0]
+ElementTree = importElementTree()
+SafeElementTree = importSafeElementTree()
 
 from openid.yadis import xri
 
@@ -66,8 +55,10 @@ def parseXRDS(text):
         not contain an XRDS.
     """
     try:
-        element = ElementTree.XML(text)
-    except XMLError as why:
+        element = SafeElementTree.XML(text)
+    except (SystemExit, MemoryError, AssertionError, ImportError):
+        raise
+    except Exception as why:
         exc = XRDSError('Error parsing document as XML')
         exc.reason = why
         raise exc
@@ -187,8 +178,7 @@ def getCanonicalID(iname, xrd_tree):
     childID = canonicalID.lower()
 
     for xrd in xrd_list[1:]:
-        # XXX: can't use rsplit until we require python >= 2.4.
-        parent_sought = childID[:childID.rindex('!')]
+        parent_sought = childID.rsplit("!", 1)[0]
         parent = xri.XRI(xrd.findtext(canonicalID_tag))
         if parent_sought != parent.lower():
             raise XRDSFraud("%r can not come from %s" % (childID, parent))
