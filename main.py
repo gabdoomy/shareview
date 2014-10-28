@@ -1,6 +1,5 @@
 from __future__ import print_function
-from flask import Flask
-from flask import render_template, flash, redirect, request, make_response
+from flask import Flask, render_template, flash, redirect, request, make_response
 from flask_bootstrap import Bootstrap
 from flask.ext.wtf import Form
 from wtforms import StringField, BooleanField
@@ -11,6 +10,8 @@ import os
 import urllib
 import urllib2
 import webapp2
+import requests
+import json
 
 from google.appengine.api import users
 from google.appengine.ext import blobstore
@@ -19,14 +20,37 @@ from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 
-import requests
-import json
+import MySQLdb
+import time
 
 app = Flask(__name__)
 app.config.from_object('config')
 
 Bootstrap(app)
 app.config['DEBUG'] = True
+
+
+env = os.getenv('SERVER_SOFTWARE')
+if (env and env.startswith('Google App Engine/')):
+# Connecting from App Engine
+    db = MySQLdb.connect(
+    unix_socket='/cloudsql/bristoluni-ad-1444:us-instance-photos',
+    user='root')
+else:
+# You may also assign an IP Address from the access control
+# page and use it to connect from an external network.
+    db = MySQLdb.connect(host='173.194.105.232', port=3306, db='shareview', user='root', passwd='password')
+
+#cursor.execute('CREATE DATABASE shareview;')
+#cursor.execute('CREATE TABLE IF NOT EXISTS shareview.users (ID INT NOT NULL AUTO_INCREMENT,  username VARCHAR(255),  password VARCHAR(255),  PRIMARY KEY(ID));')
+#cursor.execute('SELECT ID, username, password from shareview.users;')
+
+#userlist = [];
+#for row in cursor.fetchall():
+#    userlist.append(dict([('ID',row[0]),
+#                         ('username',row[1]),
+#                         ('password',row[2])
+#                        ]))
 
 @app.route('/logingoogle')
 def check():
@@ -68,6 +92,7 @@ def post():
     #city = request.params['city']
     #print(city)
     if request.method == 'POST':
+        user = users.get_current_user()
         file = request.files['file']
         city =  request.form["city"]
         request_string = urllib2.Request ('http://nominatim.openstreetmap.org/search?q='+city+'&format=json')
@@ -76,10 +101,15 @@ def post():
         lat = json_string[0]["lat"]
         lon = json_string[0]["lon"]
         city_name = json_string[0]["display_name"]
+        print(city_name.encode("utf-8"))
         header = file.headers['Content-Type']
         parsed_header = parse_options_header(header)
         blob_key = parsed_header[1]['blob-key']
-        return blob_key+"<br>lat: "+lat+"<br>lon: "+lon+"<br>City: "+city_name
+        db.cursor().execute('INSERT INTO shareview.photos (name, user, lat, lon, city, date, time) values (\"'+str(blob_key)+'\",\"'+str(user)+'\",'+str(lat)+','+str(lon)+',\"'+str(city_name.encode("utf-8"))+'\",\"'+str(time.strftime("%Y-%m-%d"))+'\",\"'+str(time.strftime("%H:%M:%S"))+ '\");')
+        db.commit()
+        return 'INSERT INTO shareview.photos (name, user, lat, lon, city, date, time) values (\"'+str(blob_key)+'\",\"'+str(user)+'\",'+str(lat)+','+str(lon)+',\"'+str(city_name.encode("utf-8"))+'\",\"'+str(time.strftime("%Y-%m-%d"))+'\",\"'+str(time.strftime("%H:%M:%S"))+ '\");'
+        #'INSERT INTO shareview.photos (name, user, lat, lon, city, date, time) values (\"'+str(blob_key)+'\",\"'+str(user)+'\",'+str(lat)+','+str(lon)+',\"'+str(city_name)+'\",\"'+str(time.strftime("%Y-%m-%d")) +'\",\"'+str(time.strftime("%H:%M:%S")) +'\");'
+        #blob_key+"<br>lat: "+lat+"<br>lon: "+lon+"<br>City: "+city_name+"<br>date:"+time.strftime("%Y-%m-%d")+"<br>time:"+time.strftime("%H:%M:%S")
 
 @app.route("/img/<bkey>")
 def img(bkey):
