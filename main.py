@@ -34,7 +34,7 @@ env = os.getenv('SERVER_SOFTWARE')
 if (env and env.startswith('Google App Engine/')):
 # Connecting from App Engine
     db = MySQLdb.connect(
-    unix_socket='/cloudsql/bristoluni-ad-1444:us-instance-photos',
+    unix_socket='/cloudsql/bristoluni-ad-1444:us-instance-1',
     user='root')
 else:
 # You may also assign an IP Address from the access control
