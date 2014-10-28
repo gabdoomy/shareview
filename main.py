@@ -9,6 +9,7 @@ from werkzeug.http import parse_options_header, parse_cache_control_header, pars
 
 import os
 import urllib
+import urllib2
 import webapp2
 
 from google.appengine.api import users
@@ -17,6 +18,9 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
+
+import requests
+import json
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -42,19 +46,40 @@ def home():
                             title='Home',
                             user=user.nickname())
 
+@app.route('/profile')
+def profile():
+    """Profile page"""
+    user = users.get_current_user()
+    return render_template('profile.html',
+                            title='Profile',
+                            user=user.nickname())
+
 @app.route('/mainupload')
 def mainupload():
+    user = users.get_current_user()
     upload_url = blobstore.create_upload_url('/upload')
-    return('<html><body><form action="%s" method="POST" enctype="multipart/form-data">Upload File: <input type="file" name="file"><br> <input type="submit" name="submit" value="Submit"> </form></body></html>' % upload_url)
+    return render_template('mainupload.html',
+                    title='Upload',
+                    upload_url=upload_url,
+                    user=user.nickname())
 
 @app.route('/upload', methods=['POST'])
 def post():
+    #city = request.params['city']
+    #print(city)
     if request.method == 'POST':
         file = request.files['file']
+        city =  request.form["city"]
+        request_string = urllib2.Request ('http://nominatim.openstreetmap.org/search?q='+city+'&format=json')
+        response = urllib2.urlopen (request_string)
+        json_string = json.loads(response.read())
+        lat = json_string[0]["lat"]
+        lon = json_string[0]["lon"]
+        city_name = json_string[0]["display_name"]
         header = file.headers['Content-Type']
         parsed_header = parse_options_header(header)
         blob_key = parsed_header[1]['blob-key']
-        return blob_key
+        return blob_key+"<br>lat: "+lat+"<br>lon: "+lon+"<br>City: "+city_name
 
 @app.route("/img/<bkey>")
 def img(bkey):
@@ -77,5 +102,5 @@ def check_auth():
     else:
         greeting = ('<a href="%s">Sign in or register</a>.' %
                     users.create_login_url('/'))
-
     return ('<html><body>%s</body></html>' % greeting)
+

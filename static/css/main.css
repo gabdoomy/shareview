@@ -1,0 +1,12 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+#googleMap{
+    min-height:100%;
+}
+
+.navbar{
+    margin-bottom: 0px;
+}

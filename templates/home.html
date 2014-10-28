@@ -1,19 +1,49 @@
 {% extends "base.html" %}
+
+{% block head %}
+
+<link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='css/main.css')}}"/>
+<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBfGe6xmqnRePan_U2AQanxi-qrbugN9FM&sensor=false"></script>
+<script>
+var point1=new google.maps.LatLng(51.508742,-0.120850);
+var point2=new google.maps.LatLng(30.508742,4.0850);
+
+function initialize() {
+  var mapProp = {
+    center:new google.maps.LatLng(35,0),
+    zoom:2,
+    mapTypeId:google.maps.MapTypeId.ROADMAP
+    };
+
+  var map=new google.maps.Map(document.getElementById("googleMap"),mapProp);
+
+  function placeMarker(location) {
+    var marker = new google.maps.Marker({
+      position: location,
+      map: map,
+    });
+    var infowindow = new google.maps.InfoWindow({
+      content: 'Latitude: ' + location.lat() +
+      '<br>Longitude: ' + location.lng()
+    });
+    google.maps.event.addListener(marker, 'click', function() {
+    infowindow.open(map,marker);
+    });
+  }
+
+placeMarker(point1);
+placeMarker(point2);
+
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+</script>
+
+{% endblock %}
+
 {% block content %}
-    <h1>Hi, {{ user }}! Alex te place :*</h1>
-   <!--  {% for post in posts %}
-    <div><p>{{ post.author.nickname }} says: <b>{{ post.body }}</b></p></div>
-    {% endfor %} -->
 
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul>
-        {% for message in messages %}
-            <li>{{ message }} </li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+<div id="googleMap"></div>
 
-    
+
 {% endblock %}
