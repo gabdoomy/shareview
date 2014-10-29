@@ -22,6 +22,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 
 import MySQLdb
 import time
+from collections import defaultdict
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -66,9 +67,31 @@ def index():
 def home():
     """Home page"""
     user = users.get_current_user()
+    cursor=db.cursor()
+    cursor.execute("SELECT * FROM shareview.photos WHERE user=\""+str(user)+"\" ORDER BY city LIMIT 3;")
+    print("start")
+    # photos = [];
+    # cities_list=[];
+    # for row in cursor.fetchall():
+    #     cities_list.append(row[5]);
+    #     cities=set(cities_list);
+    dictionary = defaultdict(list)
+    for row in cursor.fetchall():
+        dictionary[str(row[5])]=[row[3],row[4]]
+    cursor.execute("SELECT * FROM shareview.photos WHERE user=\""+str(user)+"\" ORDER BY city LIMIT 3;")
+    for row in cursor.fetchall():
+        dictionary[str(row[5])].append(row[1])
+    for key, value in dictionary.items() :
+        print (key, value)
+    json_string = str(json.dumps(dictionary))
+    print(json_string)
     return render_template('home.html',
                             title='Home',
+                            data=json_string,
                             user=user.nickname())
+
+def date_handler(obj):
+    return obj.isoformat() if hasattr(obj, 'isoformat') else obj
 
 @app.route('/profile')
 def profile():

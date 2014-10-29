@@ -15,25 +15,47 @@ function initialize() {
     mapTypeId:google.maps.MapTypeId.ROADMAP
     };
 
+  var infowindow = new google.maps.InfoWindow();
   var map=new google.maps.Map(document.getElementById("googleMap"),mapProp);
 
-  function placeMarker(location) {
+  function placeMarker(location, value) {
+    
+    var result='';
+    for(var i=0; i< value.length; i++){
+      var img_link = window.location.origin+"/img/"+value[i];
+      result=result+"<a href=\""+img_link+"\"><img src=\""+img_link+"\" height=\"40\" width=\"40\"/></a>";
+    }
+    console.log(result);
+
     var marker = new google.maps.Marker({
       position: location,
       map: map,
+      descrip : result
     });
-    var infowindow = new google.maps.InfoWindow({
-      content: 'Latitude: ' + location.lat() +
-      '<br>Longitude: ' + location.lng()
-    });
+
     google.maps.event.addListener(marker, 'click', function() {
-    infowindow.open(map,marker);
+      if (infowindow) {
+        infowindow.close();
+      };
+      infowindow.setOptions({
+        content: this.descrip,
+        maxWidth:300
+      });
+      infowindow.open(map,marker);
     });
   }
+    var data = '{{data|safe}}';
+    var json_dict = JSON.parse(data);   
 
-placeMarker(point1);
-placeMarker(point2);
-
+    for (var i in json_dict) {
+      if (json_dict.hasOwnProperty(i)) {
+        var point=new google.maps.LatLng(json_dict[i][0],json_dict[i][1]);
+        var value = json_dict[i];
+        value.shift();
+        value.shift();
+        placeMarker(point,value);
+      }
+    }
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
