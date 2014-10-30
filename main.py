@@ -95,8 +95,18 @@ def date_handler(obj):
 def profile():
     """Profile page"""
     user = users.get_current_user()
+    cursor=db.cursor()
+    dictionary = defaultdict(list)
+    cursor.execute("SELECT * FROM shareview.photos WHERE user=\""+str(user)+"\" ORDER BY city ASC, date DESC, time DESC;")
+    for row in cursor.fetchall():
+        dictionary[str(row[5])].append(row[1])
+    for key, value in dictionary.items() :
+        print (key, value)
+    json_string = str(json.dumps(dictionary))
     return render_template('profile.html',
                             title='Profile',
+                            data=json_string,
+                            city=str(row[5]),
                             user=user.nickname())
 
 @app.route('/mainupload')
@@ -152,6 +162,7 @@ def creategallery(lat, lon):
     return render_template('gallery.html',
                             title='Gallery',
                             data=json_string,
+                            city=str(row[5]),
                             user=user.nickname())
 
 @app.route("/img/<bkey>")

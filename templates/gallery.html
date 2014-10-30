@@ -1,8 +1,32 @@
 {% extends "base.html" %}
 
+{% block head %}
+<!-- 1. Link to jQuery (1.8 or later), -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> <!-- 33 KB -->
+
+<!-- fotorama.css & fotorama.js. -->
+<link  href="http://fotorama.s3.amazonaws.com/4.6.2/fotorama.css" rel="stylesheet"> <!-- 3 KB -->
+<script src="http://fotorama.s3.amazonaws.com/4.6.2/fotorama.js"></script> <!-- 16 KB -->
+<style>
+body{margin: 0;}
+</style>
+{% endblock %}
+
 {% block content %}
 
-<div id="images"></div>
+<div class="fotorama" id="images"
+    data-allowfullscreen="native"
+    data-nav="thumbs"
+    data-width="100%"
+    data-height="95%"
+    data-autoplay="true"
+    data-loop="true"
+    data-keyboard="true"
+    data-arrows="true"
+    data-click="true"
+    data-swipe="true"
+    data-hash="true"
+    data-fit="contain"></div>
 
 <script type="text/javascript">
     var data = '{{data|safe}}';
@@ -12,11 +36,11 @@
     for (var i in json_dict) {
       if (json_dict.hasOwnProperty(i)) {
         var value = json_dict[i];
+        for(var i=0; i< value.length; i++){
+            var img_link = window.location.origin+"/img/"+value[i];
+            result=result+"<img src=\""+img_link+"\">";
+        }
       }
-    }
-    for(var i=0; i< value.length; i++){
-        var img_link = window.location.origin+"/img/"+value[i];
-        result=result+"<a href=\""+img_link+"\"><img src=\""+img_link+"\" height=\"100px\" width=\"100px\"/></a><br>";
     }
 
     document.getElementById('images').innerHTML += result;
