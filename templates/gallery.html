@@ -9,6 +9,7 @@
 <script src="http://fotorama.s3.amazonaws.com/4.6.2/fotorama.js"></script> <!-- 16 KB -->
 <style>
 body{margin: 0;}
+.fotorama {margin-bottom: 15px;}
 </style>
 {% endblock %}
 
@@ -26,7 +27,8 @@ body{margin: 0;}
     data-click="true"
     data-swipe="true"
     data-hash="true"
-    data-fit="contain"></div>
+    data-fit="contain"
+    ></div>
 
 <script type="text/javascript">
     var data = '{{data|safe}}';
