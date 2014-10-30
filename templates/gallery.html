@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div id="images"></div>
+
+<script type="text/javascript">
+    var data = '{{data|safe}}';
+    var json_dict = JSON.parse(data);  
+    console.log(json_dict); 
+    var result="";
+    for (var i in json_dict) {
+      if (json_dict.hasOwnProperty(i)) {
+        var value = json_dict[i];
+      }
+    }
+    for(var i=0; i< value.length; i++){
+        var img_link = window.location.origin+"/img/"+value[i];
+        result=result+"<a href=\""+img_link+"\"><img src=\""+img_link+"\" height=\"100px\" width=\"100px\"/></a><br>";
+    }
+
+    document.getElementById('images').innerHTML += result;
+</script>
+
+{% endblock %}

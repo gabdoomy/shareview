@@ -27,6 +27,11 @@ function initialize() {
       var img_link = window.location.origin+"/img/"+value[i];
       result=result+"<a href=\""+img_link+"\"><img src=\""+img_link+"\" height=\"40\" width=\"40\"/></a>";
     }
+    var lat=location.lat().toFixed(7);
+    var lon=location.lng().toFixed(7);
+
+    var gallery_link = window.location.origin+"/gallery/"+lat+"/"+lon;
+    result+="<br><a href=\""+gallery_link+"\">View Gallery</a>";
     console.log(value);
 
     var marker = new google.maps.Marker({

@@ -68,8 +68,7 @@ def home():
     """Home page"""
     user = users.get_current_user()
     cursor=db.cursor()
-    cursor.execute("SELECT * FROM shareview.photos WHERE user=\""+str(user)+"\" ORDER BY city;")
-    print("start")
+    cursor.execute("SELECT * FROM shareview.photos WHERE user=\""+str(user)+"\" ORDER BY city ASC, date DESC, time DESC;")
     # photos = [];
     # cities_list=[];
     # for row in cursor.fetchall():
@@ -127,15 +126,33 @@ def post():
         header = file.headers['Content-Type']
         parsed_header = parse_options_header(header)
         blob_key = parsed_header[1]['blob-key']
-        db.cursor().execute('INSERT INTO shareview.photos (name, user, lat, lon, city, date, time) values (\"'+str(blob_key)+'\",\"'+str(user)+'\",'+str(lat)+','+str(lon)+',\"'+str(city_name.encode("utf-8"))+'\",\"'+str(time.strftime("%Y-%m-%d"))+'\",\"'+str(time.strftime("%H:%M:%S"))+ '\");')
+        statement='INSERT INTO shareview.photos (name, user, lat, lon, city, date, time) values (\"'+str(blob_key)+'\",\"'+str(user)+'\",'+str(lat)+','+str(lon)+',\"'+str(city_name.encode("utf-8"))+'\",\"'+str(time.strftime("%Y-%m-%d"))+'\",\"'+str(time.strftime("%H:%M:%S"))+ '\");'
+        statement=statement.encode("utf-8")
+        db.cursor().execute(statement)
         db.commit()
         return render_template('uploadresult.html',
                     title='Upload Done',
                     user=user.nickname(),
-                    statement='INSERT INTO shareview.photos (name, user, lat, lon, city, date, time) values (\"'+str(blob_key)+'\",\"'+str(user)+'\",'+str(lat)+','+str(lon)+',\"'+str(city_name.encode("utf-8"))+'\",\"'+str(time.strftime("%Y-%m-%d"))+'\",\"'+str(time.strftime("%H:%M:%S"))+ '\");'
+                    statement=statement
                     )
         #'INSERT INTO shareview.photos (name, user, lat, lon, city, date, time) values (\"'+str(blob_key)+'\",\"'+str(user)+'\",'+str(lat)+','+str(lon)+',\"'+str(city_name)+'\",\"'+str(time.strftime("%Y-%m-%d")) +'\",\"'+str(time.strftime("%H:%M:%S")) +'\");'
         #blob_key+"<br>lat: "+lat+"<br>lon: "+lon+"<br>City: "+city_name+"<br>date:"+time.strftime("%Y-%m-%d")+"<br>time:"+time.strftime("%H:%M:%S")
+
+@app.route("/gallery/<lat>/<lon>")
+def creategallery(lat, lon):
+    user = users.get_current_user()
+    cursor=db.cursor()
+    dictionary = defaultdict(list)
+    cursor.execute("SELECT * FROM shareview.photos WHERE user=\""+str(user)+"\" AND lat=\""+lat+"\" AND lon=\""+lon+"\" ORDER BY city ASC, date DESC, time DESC;")
+    for row in cursor.fetchall():
+        dictionary[str(row[5])].append(row[1])
+    for key, value in dictionary.items() :
+        print (key, value)
+    json_string = str(json.dumps(dictionary))
+    return render_template('gallery.html',
+                            title='Gallery',
+                            data=json_string,
+                            user=user.nickname())
 
 @app.route("/img/<bkey>")
 def img(bkey):
