@@ -68,7 +68,7 @@ def home():
     """Home page"""
     user = users.get_current_user()
     cursor=db.cursor()
-    cursor.execute("SELECT * FROM shareview.photos WHERE user=\""+str(user)+"\" ORDER BY city LIMIT 3;")
+    cursor.execute("SELECT * FROM shareview.photos WHERE user=\""+str(user)+"\" ORDER BY city;")
     print("start")
     # photos = [];
     # cities_list=[];
@@ -78,13 +78,12 @@ def home():
     dictionary = defaultdict(list)
     for row in cursor.fetchall():
         dictionary[str(row[5])]=[row[3],row[4]]
-    cursor.execute("SELECT * FROM shareview.photos WHERE user=\""+str(user)+"\" ORDER BY city LIMIT 3;")
+    cursor.execute("SELECT * FROM shareview.photos WHERE user=\""+str(user)+"\" ORDER BY city ASC, date DESC, time DESC;")
     for row in cursor.fetchall():
         dictionary[str(row[5])].append(row[1])
-    for key, value in dictionary.items() :
-        print (key, value)
+    # for key, value in dictionary.items() :
+    #     print (key, value)
     json_string = str(json.dumps(dictionary))
-    print(json_string)
     return render_template('home.html',
                             title='Home',
                             data=json_string,
@@ -130,7 +129,11 @@ def post():
         blob_key = parsed_header[1]['blob-key']
         db.cursor().execute('INSERT INTO shareview.photos (name, user, lat, lon, city, date, time) values (\"'+str(blob_key)+'\",\"'+str(user)+'\",'+str(lat)+','+str(lon)+',\"'+str(city_name.encode("utf-8"))+'\",\"'+str(time.strftime("%Y-%m-%d"))+'\",\"'+str(time.strftime("%H:%M:%S"))+ '\");')
         db.commit()
-        return 'INSERT INTO shareview.photos (name, user, lat, lon, city, date, time) values (\"'+str(blob_key)+'\",\"'+str(user)+'\",'+str(lat)+','+str(lon)+',\"'+str(city_name.encode("utf-8"))+'\",\"'+str(time.strftime("%Y-%m-%d"))+'\",\"'+str(time.strftime("%H:%M:%S"))+ '\");'
+        return render_template('uploadresult.html',
+                    title='Upload Done',
+                    user=user.nickname(),
+                    statement='INSERT INTO shareview.photos (name, user, lat, lon, city, date, time) values (\"'+str(blob_key)+'\",\"'+str(user)+'\",'+str(lat)+','+str(lon)+',\"'+str(city_name.encode("utf-8"))+'\",\"'+str(time.strftime("%Y-%m-%d"))+'\",\"'+str(time.strftime("%H:%M:%S"))+ '\");'
+                    )
         #'INSERT INTO shareview.photos (name, user, lat, lon, city, date, time) values (\"'+str(blob_key)+'\",\"'+str(user)+'\",'+str(lat)+','+str(lon)+',\"'+str(city_name)+'\",\"'+str(time.strftime("%Y-%m-%d")) +'\",\"'+str(time.strftime("%H:%M:%S")) +'\");'
         #blob_key+"<br>lat: "+lat+"<br>lon: "+lon+"<br>City: "+city_name+"<br>date:"+time.strftime("%Y-%m-%d")+"<br>time:"+time.strftime("%H:%M:%S")
 

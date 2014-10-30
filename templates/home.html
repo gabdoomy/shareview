@@ -23,11 +23,11 @@ function initialize() {
   function placeMarker(location, value) {
     
     var result='';
-    for(var i=0; i< value.length; i++){
+    for(var i=0; i< value.length && i<3 ; i++){
       var img_link = window.location.origin+"/img/"+value[i];
       result=result+"<a href=\""+img_link+"\"><img src=\""+img_link+"\" height=\"40\" width=\"40\"/></a>";
     }
-    console.log(result);
+    console.log(value);
 
     var marker = new google.maps.Marker({
       position: location,
