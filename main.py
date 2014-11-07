@@ -40,7 +40,7 @@ if (env and env.startswith('Google App Engine/')):
 else:
 # You may also assign an IP Address from the access control
 # page and use it to connect from an external network.
-    db = MySQLdb.connect(host='173.194.105.232', port=3306, db='shareview', user='root', passwd='password')
+    db = MySQLdb.connect(host='173.194.245.86', port=3306, db='shareview', user='root', passwd='password')
 
 #cursor.execute('CREATE DATABASE shareview;')
 #cursor.execute('CREATE TABLE IF NOT EXISTS shareview.users (ID INT NOT NULL AUTO_INCREMENT,  username VARCHAR(255),  password VARCHAR(255),  PRIMARY KEY(ID));')

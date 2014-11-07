@@ -3,6 +3,9 @@
 {% block head %}
 <!-- 1. Link to jQuery (1.8 or later), -->
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> <!-- 33 KB -->
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/sidebar.css')}}" />
+<script type="text/javascript" src="http://code.jquery.com/ui/1.8.13/jquery-ui.min.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.sidebar.js')}}"></script>
 
 <!-- fotorama.css & fotorama.js. -->
 <link  href="http://fotorama.s3.amazonaws.com/4.6.2/fotorama.css" rel="stylesheet"> <!-- 3 KB -->
@@ -14,6 +17,10 @@ body{margin: 0;}
 {% endblock %}
 
 {% block content %}
+
+<div id="sidebar" >
+Location:<br><br>
+</div>
 
 <div class="fotorama" id="images"
     data-allowfullscreen="native"
@@ -31,6 +38,10 @@ body{margin: 0;}
     ></div>
 
 <script type="text/javascript">
+$("div#sidebar").sidebar();
+</script>
+
+<script type="text/javascript">
     var data = '{{data|safe}}';
     var json_dict = JSON.parse(data);  
     console.log(json_dict); 
@@ -46,6 +57,7 @@ body{margin: 0;}
     }
 
     document.getElementById('images').innerHTML += result;
+    document.getElementById('sidebar').innerHTML += Object.keys(json_dict);
 </script>
 
 {% endblock %}
