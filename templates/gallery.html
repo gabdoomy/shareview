@@ -22,6 +22,10 @@ body{margin: 0;}
 Location:<br><br>
 </div>
 
+
+<div class="fb-share-button" data-href="http://bristoluni-ad-1444.appspot.com/profile" data-layout="button" id="sharebutton"></div>
+
+
 <div class="fotorama" id="images"
     data-allowfullscreen="native"
     data-nav="thumbs"
@@ -58,6 +62,12 @@ $("div#sidebar").sidebar();
 
     document.getElementById('images').innerHTML += result;
     document.getElementById('sidebar').innerHTML += Object.keys(json_dict);
+
+     $('#images').on('fotorama:show', function (e, fotorama) {
+        $('#sharebutton').attr( 'data-href', window.location.origin+'/img/'+value[fotorama.activeIndex]);
+        //document.getElementById("fb-share-button").setAttribute("data-href", "<img src=\""+window.location.origin+"/img/"+value[fotorama.activeIndex]+"\">");
+    });
+
 </script>
 
 {% endblock %}

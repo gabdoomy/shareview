@@ -9,6 +9,10 @@ handlers:
   script: main.app
   login: optional
 
+- url: /img/.*
+  script: main.app
+  login: optional
+
 - url: /static/.*
   script: main.app
   login: optional

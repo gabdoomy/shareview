@@ -13,6 +13,9 @@ body{margin: 0;}
 {% endblock %}
 
 {% block content %}
+<div id="share"></div>
+
+<div class="fb-share-button" data-href="http://bristoluni-ad-1444.appspot.com/profile" data-layout="button" id="sharebutton"></div>
 
 <div class="fotorama" id="images"
     data-allowfullscreen="native"
@@ -27,6 +30,8 @@ body{margin: 0;}
     data-swipe="true"
     data-hash="true"
     data-fit="contain"></div>
+
+
 
 <script type="text/javascript">
     var data = '{{data|safe}}';
@@ -44,6 +49,12 @@ body{margin: 0;}
     }
 
     document.getElementById('images').innerHTML += result;
+
+
+    $('#images').on('fotorama:show', function (e, fotorama) {
+        $('#sharebutton').attr( 'data-href', '<img src=\"'+window.location.origin+'/img/'+value[fotorama.activeIndex]+'\">');
+        //document.getElementById("fb-share-button").setAttribute("data-href", "<img src=\""+window.location.origin+"/img/"+value[fotorama.activeIndex]+"\">");
+    });
 </script>
 
 {% endblock %}
