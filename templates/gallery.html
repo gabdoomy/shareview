@@ -23,9 +23,6 @@ Location:<br><br>
 </div>
 
 
-<div class="fb-share-button" data-href="http://bristoluni-ad-1444.appspot.com/profile" data-layout="button" id="sharebutton"></div>
-
-
 <div class="fotorama" id="images"
     data-allowfullscreen="native"
     data-nav="thumbs"
@@ -60,12 +57,24 @@ $("div#sidebar").sidebar();
       }
     }
 
+   
+
+
     document.getElementById('images').innerHTML += result;
     document.getElementById('sidebar').innerHTML += Object.keys(json_dict);
+    document.getElementById('sidebar').innerHTML +=  "<br><br><a href=\"https://twitter.com/share\" class=\"twitter-share-button\" data-url=\"http://www.google.com\" data-text=\"Check out this photo: \" id=\"tweetbutton\">Tweet</a>"
+    document.getElementById('sidebar').innerHTML += "<div class=\"fb-share-button\" data-href=\"http://bristoluni-ad-1444.appspot.com/profile\" data-layout=\"button\" id=\"sharebutton\"></div>";
+
+
 
      $('#images').on('fotorama:show', function (e, fotorama) {
-        $('#sharebutton').attr( 'data-href', window.location.origin+'/img/'+value[fotorama.activeIndex]);
-        //document.getElementById("fb-share-button").setAttribute("data-href", "<img src=\""+window.location.origin+"/img/"+value[fotorama.activeIndex]+"\">");
+        console.log(fotorama.activeIndex);
+        console.log(value[fotorama.activeIndex]);
+        //$('#sharebutton').attr( 'data-href', window.location.origin+'/img/'+value[fotorama.activeIndex]);
+        //$('#tweetbutton').attr( 'data-url',window.location.origin+'/img/'+value[fotorama.activeIndex]);
+        document.getElementById('sharebutton').setAttribute("data-href", window.location.origin+"/img/"+value[fotorama.activeIndex]);
+        document.getElementById('tweetbutton').setAttribute("data-url", window.location.origin+"/img/"+value[fotorama.activeIndex]);
+   
     });
 
 </script>

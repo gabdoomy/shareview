@@ -9,12 +9,13 @@
 <script src="http://fotorama.s3.amazonaws.com/4.6.2/fotorama.js"></script> <!-- 16 KB -->
 <style>
 body{margin: 0;}
+.fotorama {margin-bottom: 15px;}
 </style>
 {% endblock %}
 
 {% block content %}
-<div id="share"></div>
 
+<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://www.google.com" data-text="Check out this photo: " id="tweetbutton">Tweet</a>
 <div class="fb-share-button" data-href="http://bristoluni-ad-1444.appspot.com/profile" data-layout="button" id="sharebutton"></div>
 
 <div class="fotorama" id="images"
@@ -52,7 +53,8 @@ body{margin: 0;}
 
 
     $('#images').on('fotorama:show', function (e, fotorama) {
-        $('#sharebutton').attr( 'data-href', '<img src=\"'+window.location.origin+'/img/'+value[fotorama.activeIndex]+'\">');
+        $('#sharebutton').attr( 'data-href',window.location.origin+'/img/'+value[fotorama.activeIndex]);
+        $('#tweetbutton').attr( 'data-url',window.location.origin+'/img/'+value[fotorama.activeIndex]);
         //document.getElementById("fb-share-button").setAttribute("data-href", "<img src=\""+window.location.origin+"/img/"+value[fotorama.activeIndex]+"\">");
     });
 </script>
