@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block head %}
+<!-- 1. Link to jQuery (1.8 or later), -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> <!-- 33 KB -->
+
+{% endblock %}
+
+{% block content %}
+
+<script type="text/javascript">
+   <script type="text/javascript">
+                 function f1()
+                   {
+                     document.getElementById("abc").href="xyz.php"; 
+                   }
+       </script>
+</script>
+
+{% endblock %}

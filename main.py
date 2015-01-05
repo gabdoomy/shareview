@@ -87,11 +87,15 @@ def home():
         dictionary[str(row[5])].append(row[1])
     # for key, value in dictionary.items() :
     #     print (key, value)
+    logout_url=""
+    if user:
+            logout_url = users.create_logout_url('/')
     json_string = str(json.dumps(dictionary))
     return render_template('home.html',
                             title='Home',
                             data=json_string,
-                            user=user.nickname())
+                            user=user.nickname(),
+                            logout=logout_url)
 
 def date_handler(obj):
     return obj.isoformat() if hasattr(obj, 'isoformat') else obj
@@ -107,21 +111,37 @@ def profile():
         dictionary[str(row[5])].append(row[1])
     for key, value in dictionary.items() :
         print (key, value)
+    size=cursor.fetchone()
+    cityname="null"
+    print(str(size))
+    if(str(size)=="None"):
+        json_string=""
+    else:
+        for row in cursor.fetchall():
+            cityname=str(row[5])
     json_string = str(json.dumps(dictionary))
+    logout_url=""
+    if user:
+            logout_url = users.create_logout_url('/')
     return render_template('profile.html',
                             title='Profile',
                             data=json_string,
-                            city=str(row[5]),
-                            user=user.nickname())
+                            city=cityname,
+                            user=user.nickname(),
+                            logout=logout_url)
 
 @app.route('/mainupload')
 def mainupload():
     user = users.get_current_user()
     upload_url = blobstore.create_upload_url('/upload')
+    logout_url=""
+    if user:
+            logout_url = users.create_logout_url('/')
     return render_template('mainupload.html',
                     title='Upload',
                     upload_url=upload_url,
-                    user=user.nickname())
+                    user=user.nickname(),
+                    logout=logout_url)
 
 @app.route('/upload', methods=['POST'])
 def post():
@@ -145,11 +165,14 @@ def post():
         statement=statement.encode("utf-8")
         db.cursor().execute(statement)
         db.commit()
+        logout_url=""
+        if user:
+                logout_url = users.create_logout_url('/')
         return render_template('uploadresult.html',
                     title='Upload Done',
                     user=user.nickname(),
-                    statement=statement
-                    )
+                    statement=statement,
+                    logout=logout_url)
         #'INSERT INTO shareview.photos (name, user, lat, lon, city, date, time) values (\"'+str(blob_key)+'\",\"'+str(user)+'\",'+str(lat)+','+str(lon)+',\"'+str(city_name)+'\",\"'+str(time.strftime("%Y-%m-%d")) +'\",\"'+str(time.strftime("%H:%M:%S")) +'\");'
         #blob_key+"<br>lat: "+lat+"<br>lon: "+lon+"<br>City: "+city_name+"<br>date:"+time.strftime("%Y-%m-%d")+"<br>time:"+time.strftime("%H:%M:%S")
 
@@ -164,11 +187,14 @@ def creategallery(lat, lon):
     for key, value in dictionary.items() :
         print (key, value)
     json_string = str(json.dumps(dictionary))
+    if user:
+            logout_url = users.create_logout_url('/')
     return render_template('gallery.html',
                             title='Gallery',
                             data=json_string,
                             city=str(row[5]),
-                            user=user.nickname())
+                            user=user.nickname(),
+                            logout=logout_url)
 
 @app.route("/img/<bkey>")
 def img(bkey):

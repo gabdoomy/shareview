@@ -34,21 +34,23 @@ body{margin: 0;}
 
 <script type="text/javascript">
     var data = '{{data|safe}}';
-    var json_dict = JSON.parse(data);  
-    console.log(json_dict); 
-    var result="";
-    for (var i in json_dict) {
-      if (json_dict.hasOwnProperty(i)) {
-        var value = json_dict[i];
-      }
-    }
-    for(var i=0; i< value.length; i++){
-        var img_link = window.location.origin+"/img/"+value[i];
-        result=result+"<img src=\""+img_link+"\">";
-    }
+    console.log("data: "+data.length);
+    if(data.length==2) document.getElementById('images').innerHTML = "<h2>&nbsp;&nbsp;&nbsp;No image</h2>";
+    else {
+        var json_dict = JSON.parse(data);  
+        var result="";
+        for (var i in json_dict) {
+          if (json_dict.hasOwnProperty(i)) {
+            var value = json_dict[i];
+          }
+        }
+        for(var i=0; i< value.length; i++){
+            var img_link = window.location.origin+"/img/"+value[i];
+            result=result+"<img src=\""+img_link+"\">";
+        }
 
-    document.getElementById('images').innerHTML += result;
-
+        document.getElementById('images').innerHTML += result;
+    }
 </script>
 
 {% endblock %}
