@@ -30,17 +30,22 @@ app.config.from_object('config')
 Bootstrap(app)
 app.config['DEBUG'] = True
 
-
 env = os.getenv('SERVER_SOFTWARE')
 if (env and env.startswith('Google App Engine/')):
 # Connecting from App Engine
     db = MySQLdb.connect(
-    unix_socket='/cloudsql/bristoluni-ad-1444:us-instance-1',
+    unix_socket='/cloudsql/bristoluni-cloud-ad1444:us-instance-copy1',
+    user='root')
+    db.close()
+    db = MySQLdb.connect(
+    unix_socket='/cloudsql/bristoluni-cloud-ad1444:us-instance-copy1',
     user='root')
 else:
 # You may also assign an IP Address from the access control
 # page and use it to connect from an external network.
-    db = MySQLdb.connect(host='173.194.245.86', port=3306, db='shareview', user='root', passwd='password')
+    db = MySQLdb.connect(host='173.194.110.240', port=3306, db='shareview', user='root', passwd='password')
+    db.close()
+    db = MySQLdb.connect(host='173.194.110.240', port=3306, db='shareview', user='root', passwd='password')
 
 #cursor.execute('CREATE DATABASE shareview;')
 #cursor.execute('CREATE TABLE IF NOT EXISTS shareview.users (ID INT NOT NULL AUTO_INCREMENT,  username VARCHAR(255),  password VARCHAR(255),  PRIMARY KEY(ID));')
