@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block head %}
+<!-- 1. Link to jQuery (1.8 or later), -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> <!-- 33 KB -->
+
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/examples.css')}}" media="all" />
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/transitions.css')}}" media="all" />
+
+<script src="{{ url_for('static', filename='js/jquery.collagePlus.js')}}"></script>
+<script src="{{ url_for('static', filename='js/extras/jquery.removeWhitespace.js')}}"></script>
+<script src="{{ url_for('static', filename='js/extras/jquery.collageCaption.js')}}" ></script>
+
+<script type="text/javascript">
+
+// All images need to be loaded for this plugin to work so
+// we end up waiting for the whole window to load in this example
+$(window).load(function () {
+    $(document).ready(function(){
+        collage();
+        $('.Collage').collageCaption();
+    });
+});
+
+// Here we apply the actual CollagePlus plugin
+function collage() {
+    $('.Collage').removeWhitespace().collagePlus(
+        {
+            'fadeSpeed'     : 2000,
+            'targetHeight'  : 200,
+            'effect'        : 'effect-3',
+            'direction'     : 'vertical'
+        }
+    );
+};
+
+// This is just for the case that the browser window is resized
+var resizeTimer = null;
+$(window).bind('resize', function() {
+    // hide all the images until we resize them
+    $('.Collage .Image_Wrapper').css("opacity", 0);
+    // set a timer to re-apply the plugin
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(collage, 200);
+});
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+
+
+<section class="Collage effect-parent" id="images"></section>
+
+<script type="text/javascript">
+    var data = '{{data|safe}}';
+    console.log("data: "+data.length);
+    if(data.length==2) document.getElementById('images').innerHTML = "<h2>&nbsp;&nbsp;&nbsp;No image</h2>";
+    else {
+        var json_dict = JSON.parse(data);  
+        var result="";
+        for (var i in json_dict) {
+          if (json_dict.hasOwnProperty(i)) {
+            var value = json_dict[i];
+        
+            for(var i=0; i< value.length; i++){
+                var img_link = window.location.origin+"/img/"+value[i];
+                result=result+"<div class=\"Image_Wrapper\" data-caption=\"This is some data <u>with</u>html in it\"><a><img src=\""+img_link+"\"></a></div>";
+                //result=result+"<img src=\""+img_link+"\">";
+            }
+        }
+    }   
+
+        document.getElementById('images').innerHTML += result;
+    }
+</script>
+
+{% endblock %}

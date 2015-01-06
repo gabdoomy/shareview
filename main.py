@@ -130,6 +130,36 @@ def profile():
                             user=user.nickname(),
                             logout=logout_url)
 
+@app.route('/collage')
+def collage():
+    """Photo Collage page"""
+    user = users.get_current_user()
+    cursor=db.cursor()
+    dictionary = defaultdict(list)
+    cursor.execute("SELECT * FROM shareview.photos WHERE user=\""+str(user)+"\" ORDER BY city ASC, date DESC, time DESC;")
+    for row in cursor.fetchall():
+        dictionary[str(row[5])].append(row[1])
+    for key, value in dictionary.items() :
+        print (key, value)
+    size=cursor.fetchone()
+    cityname="null"
+    print(str(size))
+    if(str(size)=="None"):
+        json_string=""
+    else:
+        for row in cursor.fetchall():
+            cityname=str(row[5])
+    json_string = str(json.dumps(dictionary))
+    logout_url=""
+    if user:
+            logout_url = users.create_logout_url('/')
+    return render_template('collage.html',
+                            title='Profile',
+                            data=json_string,
+                            city=cityname,
+                            user=user.nickname(),
+                            logout=logout_url)
+
 @app.route('/mainupload')
 def mainupload():
     user = users.get_current_user()
