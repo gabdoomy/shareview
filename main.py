@@ -7,7 +7,6 @@ from wtforms.validators import DataRequired
 from werkzeug.http import parse_options_header, parse_cache_control_header, parse_set_header, dump_header
 
 import os
-import urllib
 import urllib2
 import webapp2
 import requests
@@ -23,6 +22,16 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 import MySQLdb
 import time
 from collections import defaultdict
+
+import sendgrid
+from time import gmtime, strftime
+
+sg = sendgrid.SendGridClient('gab_doomy', 'alex1992')
+message = sendgrid.Mail()
+message.set_from('bristoluni-cloud-ad1444@gmail.com')
+message.set_subject('Shareview')
+message.set_html('You have accessed your Shareview account at '+strftime("%Y-%m-%d %H:%M:%S", gmtime())+'.\n\n')
+message.set_text('You have accessed your Shareview account at '+strftime("%Y-%m-%d %H:%M:%S", gmtime())+'.\n\n')
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -70,6 +79,41 @@ def index():
 
 @app.route('/home')
 def home():
+    """Home page"""
+    user = users.get_current_user()
+    if not "@gmail.com" in str(users.get_current_user()):
+        message.add_to(str(users.get_current_user())+'@gmail.com')
+    else:
+        message.add_to(str(users.get_current_user()))
+    status, msg = sg.send(message)
+    # print("status: "+str(status)+"--")
+    cursor=db.cursor()
+    cursor.execute("SELECT * FROM shareview.photos WHERE user=\""+str(user)+"\" ORDER BY city ASC, date DESC, time DESC;")
+    # photos = [];
+    # cities_list=[];
+    # for row in cursor.fetchall():
+    #     cities_list.append(row[5]);
+    #     cities=set(cities_list);
+    dictionary = defaultdict(list)
+    for row in cursor.fetchall():
+        dictionary[str(row[5])]=[row[3],row[4]]
+    cursor.execute("SELECT * FROM shareview.photos WHERE user=\""+str(user)+"\" ORDER BY city ASC, date DESC, time DESC;")
+    for row in cursor.fetchall():
+        dictionary[str(row[5])].append(row[1])
+    # for key, value in dictionary.items() :
+    #     print (key, value)
+    logout_url=""
+    if user:
+            logout_url = users.create_logout_url('/')
+    json_string = str(json.dumps(dictionary))
+    return render_template('home.html',
+                            title='Home',
+                            data=json_string,
+                            user=user.nickname(),
+                            logout=logout_url)
+
+@app.route('/map')
+def map():
     """Home page"""
     user = users.get_current_user()
     cursor=db.cursor()

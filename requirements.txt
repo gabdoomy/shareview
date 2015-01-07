@@ -19,5 +19,6 @@ coverage
 flask_bootstrap
 pymysql
 requests
-urllib
+urllib2
 webapp2
+sendgrid
