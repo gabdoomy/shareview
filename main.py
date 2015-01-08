@@ -20,6 +20,7 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 
 import MySQLdb
+from MySQLdb import OperationalError
 import time
 from collections import defaultdict
 
@@ -45,16 +46,21 @@ if (env and env.startswith('Google App Engine/')):
     db = MySQLdb.connect(
     unix_socket='/cloudsql/bristoluni-cloud-ad1444:us-instance-copy1',
     user='root')
-    db.close()
-    db = MySQLdb.connect(
-    unix_socket='/cloudsql/bristoluni-cloud-ad1444:us-instance-copy1',
-    user='root')
 else:
 # You may also assign an IP Address from the access control
 # page and use it to connect from an external network.
     db = MySQLdb.connect(host='173.194.110.240', port=3306, db='shareview', user='root', passwd='password')
-    db.close()
-    db = MySQLdb.connect(host='173.194.110.240', port=3306, db='shareview', user='root', passwd='password')
+
+try:
+    cursor=db.cursor()
+    cursor.execute("SELECT * FROM shareview.photos;")
+except OperationalError as e:
+    if 'MySQL server has gone away' in str(e):
+        #do what you want to do on the error
+        reconnect()
+        print (e)
+    else:
+        raise e()
 
 #cursor.execute('CREATE DATABASE shareview;')
 #cursor.execute('CREATE TABLE IF NOT EXISTS shareview.users (ID INT NOT NULL AUTO_INCREMENT,  username VARCHAR(255),  password VARCHAR(255),  PRIMARY KEY(ID));')
