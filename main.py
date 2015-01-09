@@ -27,6 +27,10 @@ from collections import defaultdict
 import sendgrid
 from time import gmtime, strftime
 
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
+
 sg = sendgrid.SendGridClient('gab_doomy', 'alex1992')
 message = sendgrid.Mail()
 message.set_from('bristoluni-cloud-ad1444@gmail.com')
@@ -246,6 +250,7 @@ def post():
         db.cursor().execute(statement)
         db.commit()
         logout_url=""
+        statement="Upload complete!"
         if user:
                 logout_url = users.create_logout_url('/')
         return render_template('uploadresult.html',
