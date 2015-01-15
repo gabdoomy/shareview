@@ -31,7 +31,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-sg = sendgrid.SendGridClient('gab_doomy', 'alex1992')
+sg = sendgrid.SendGridClient('gab_doomy', 'Naruto')
 message = sendgrid.Mail()
 message.set_from('bristoluni-cloud-ad1444@gmail.com')
 message.set_subject('Shareview')
@@ -98,6 +98,15 @@ def home():
     status, msg = sg.send(message)
     # print("status: "+str(status)+"--")
     cursor=db.cursor()
+    try:
+        cursor.execute("SELECT * FROM shareview.photos;")
+    except OperationalError as e:
+        if 'MySQL server has gone away' in str(e):
+            #do what you want to do on the error
+            reconnect()
+            print (e)
+        else:
+            raise e()
     cursor.execute("SELECT * FROM shareview.photos WHERE user=\""+str(user)+"\" ORDER BY city ASC, date DESC, time DESC;")
     # photos = [];
     # cities_list=[];
