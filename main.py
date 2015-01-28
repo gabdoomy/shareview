@@ -90,6 +90,7 @@ def index():
 @app.route('/home')
 def home():
     """Home page"""
+    db = MySQLdb.connect(unix_socket='/cloudsql/bristoluni-cloud-ad1444:us-instance-copy1',user='root')
     user = users.get_current_user()
     if not "@gmail.com" in str(users.get_current_user()):
         message.add_to(str(users.get_current_user())+'@gmail.com')
