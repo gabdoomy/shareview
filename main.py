@@ -61,7 +61,7 @@ try:
 except OperationalError as e:
     if 'MySQL server has gone away' in str(e):
         #do what you want to do on the error
-        reconnect()
+        db = MySQLdb.connect(unix_socket='/cloudsql/bristoluni-cloud-ad1444:us-instance-copy1',user='root')
         print (e)
     else:
         raise e()
@@ -103,7 +103,7 @@ def home():
     except OperationalError as e:
         if 'MySQL server has gone away' in str(e):
             #do what you want to do on the error
-            reconnect()
+            db = MySQLdb.connect(unix_socket='/cloudsql/bristoluni-cloud-ad1444:us-instance-copy1',user='root')
             print (e)
         else:
             raise e()
