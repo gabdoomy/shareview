@@ -135,6 +135,7 @@ def home():
 @app.route('/map')
 def map():
     """Home page"""
+    db = MySQLdb.connect(unix_socket='/cloudsql/bristoluni-cloud-ad1444:us-instance-copy1',user='root')
     user = users.get_current_user()
     cursor=db.cursor()
     cursor.execute("SELECT * FROM shareview.photos WHERE user=\""+str(user)+"\" ORDER BY city ASC, date DESC, time DESC;")
@@ -167,6 +168,7 @@ def date_handler(obj):
 @app.route('/profile')
 def profile():
     """Profile page"""
+    db = MySQLdb.connect(unix_socket='/cloudsql/bristoluni-cloud-ad1444:us-instance-copy1',user='root')
     user = users.get_current_user()
     cursor=db.cursor()
     dictionary = defaultdict(list)
@@ -197,6 +199,7 @@ def profile():
 @app.route('/collage')
 def collage():
     """Photo Collage page"""
+    db = MySQLdb.connect(unix_socket='/cloudsql/bristoluni-cloud-ad1444:us-instance-copy1',user='root')
     user = users.get_current_user()
     cursor=db.cursor()
     dictionary = defaultdict(list)
@@ -226,6 +229,7 @@ def collage():
 
 @app.route('/mainupload')
 def mainupload():
+    db = MySQLdb.connect(unix_socket='/cloudsql/bristoluni-cloud-ad1444:us-instance-copy1',user='root')
     user = users.get_current_user()
     upload_url = blobstore.create_upload_url('/upload')
     logout_url=""
@@ -242,6 +246,7 @@ def post():
     #city = request.params['city']
     #print(city)
     if request.method == 'POST':
+        db = MySQLdb.connect(unix_socket='/cloudsql/bristoluni-cloud-ad1444:us-instance-copy1',user='root')
         user = users.get_current_user()
         file = request.files['file']
         city =  request.form["city"]
@@ -273,6 +278,7 @@ def post():
 
 @app.route("/gallery/<lat>/<lon>")
 def creategallery(lat, lon):
+    db = MySQLdb.connect(unix_socket='/cloudsql/bristoluni-cloud-ad1444:us-instance-copy1',user='root')
     user = users.get_current_user()
     cursor=db.cursor()
     dictionary = defaultdict(list)
@@ -293,6 +299,7 @@ def creategallery(lat, lon):
 
 @app.route("/img/<bkey>")
 def img(bkey):
+    db = MySQLdb.connect(unix_socket='/cloudsql/bristoluni-cloud-ad1444:us-instance-copy1',user='root')
     blob_info = blobstore.get(bkey)
     response = make_response(blob_info.open().read())
     response.headers['Content-Type'] = blob_info.content_type
